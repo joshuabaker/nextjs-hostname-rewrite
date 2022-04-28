@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 const hosts = {
+  "nextjs-hostname-rewrite.vercel.app": "0",
   "host1.testingwebsite.co": "1",
   "host2.testingwebsite.co": "2",
 };
@@ -19,10 +20,7 @@ export default function middleware(req) {
 
   const siteId = hosts[hostname];
 
-  if (
-    url.pathname.startsWith(`/_sites`) || // prevent access to _sites/* path
-    !siteId // no siteId for hostname
-  ) {
+  if (url.pathname.startsWith(`/_sites`) || !siteId) {
     return new Response(null, { status: 404 });
   }
 
@@ -30,7 +28,6 @@ export default function middleware(req) {
     url.pathname += "/page/1";
   }
 
-  // Rewrite to the current hostname under the pages/sites folder
   url.pathname = `/_sites/${siteId}${url.pathname}`;
 
   return NextResponse.rewrite(url);
